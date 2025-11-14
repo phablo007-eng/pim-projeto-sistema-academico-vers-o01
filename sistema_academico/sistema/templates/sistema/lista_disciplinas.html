@@ -1,0 +1,45 @@
+{% extends 'sistema/base.html' %}
+
+{% block title %}Disciplinas - Sistema Acadêmico{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-book-fill"></i> Disciplinas Cadastradas</h1>
+    <a href="/admin/sistema/disciplina/add/" class="btn btn-info text-white">
+        <i class="bi bi-plus-circle"></i> Nova Disciplina
+    </a>
+</div>
+
+{% if disciplinas %}
+<div class="row g-4">
+    {% for disciplina in disciplinas %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-journal-text"></i> {{ disciplina.nome }}
+                </h5>
+                <p class="card-text">
+                    <strong>Carga Horária:</strong> {{ disciplina.carga_horaria }} horas
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="/admin/sistema/disciplina/{{ disciplina.pk }}/" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="alert alert-info mt-4">
+    <strong>Total:</strong> {{ disciplinas|length }} disciplina(s) cadastrada(s)
+</div>
+{% else %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i> Nenhuma disciplina cadastrada ainda.
+    <a href="/admin/sistema/disciplina/add/" class="alert-link">Cadastrar primeira disciplina</a>
+</div>
+{% endif %}
+{% endblock %}

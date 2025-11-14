@@ -1,0 +1,17 @@
+# Ignore DLLs e binários gerados pelo módulo C
+sistema_academico/c/*.dll
+sistema_academico/c/*.pdb
+sistema_academico/c/*.lib
+
+# Ambiente virtual
+.venv/
+
+# Bytecode Python
+__pycache__/
+*.pyc
+
+# SQLite DB backups
+*.sqlite3-journal
+
+# VSCode settings locais
+.vscode/

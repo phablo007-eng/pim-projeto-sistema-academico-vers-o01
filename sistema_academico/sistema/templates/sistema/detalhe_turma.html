@@ -1,0 +1,120 @@
+{% extends 'sistema/base.html' %}
+
+{% block title %}{{ turma.nome }} - Detalhes{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Início</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'lista_turmas' %}">Turmas</a></li>
+        <li class="breadcrumb-item active">{{ turma.nome }}</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header bg-warning">
+        <h2 class="mb-0"><i class="bi bi-grid-3x3-gap-fill"></i> {{ turma.nome }}</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Curso:</strong> {{ turma.curso }}</p>
+                <p><strong>Semestre:</strong> {{ turma.semestre }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Coordenador:</strong> 
+                    {% if turma.id_coordenador %}
+                        {{ turma.id_coordenador.usuario.nome }}
+                    {% else %}
+                        <span class="text-muted">Não atribuído</span>
+                    {% endif %}
+                </p>
+                <p><strong>Total de Alunos:</strong> {{ alunos|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alunos da Turma -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="bi bi-people-fill"></i> Alunos Matriculados</h4>
+    </div>
+    <div class="card-body">
+        {% if alunos %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ aluno.matricula }}</span></td>
+                        <td>{{ aluno.usuario.nome }}</td>
+                        <td>{{ aluno.usuario.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Nenhum aluno matriculado nesta turma.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Disciplinas/Módulos da Turma -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0"><i class="bi bi-book-fill"></i> Disciplinas/Módulos</h4>
+    </div>
+    <div class="card-body">
+        {% if modulos %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Professor</th>
+                        <th>Carga Horária</th>
+                        <th>Período</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for modulo in modulos %}
+                    <tr>
+                        <td>{{ modulo.id_disciplina.nome }}</td>
+                        <td>{{ modulo.id_professor.usuario.nome }}</td>
+                        <td>{{ modulo.id_disciplina.carga_horaria }}h</td>
+                        <td>
+                            {% if modulo.data_inicio and modulo.data_fim %}
+                                {{ modulo.data_inicio|date:"d/m/Y" }} - {{ modulo.data_fim|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">Período não definido</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Nenhuma disciplina associada a esta turma.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+    <a href="{% url 'lista_turmas' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+    <a href="/admin/sistema/turma/{{ turma.pk }}/" class="btn btn-primary">
+        <i class="bi bi-pencil"></i> Editar Turma
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'sistema/base.html' %}
+
+{% block title %}Professores - Sistema Acadêmico{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-person-badge-fill"></i> Professores Cadastrados</h1>
+    <a href="/admin/sistema/professor/add/" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Novo Professor
+    </a>
+</div>
+
+{% if professores %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Matrícula</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Titulação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for professor in professores %}
+            <tr>
+                <td><span class="badge bg-success">{{ professor.matricula }}</span></td>
+                <td>{{ professor.usuario.get_full_name|default:professor.usuario.username }}</td>
+                <td>{{ professor.usuario.email }}</td>
+                <td>{{ professor.telefone|default:"Não informado" }}</td>
+                <td>{{ professor.titulacao|default:"Não informado" }}</td>
+                <td>
+                    <a href="/admin/sistema/professor/{{ professor.pk }}/" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-info">
+    <strong>Total:</strong> {{ professores|length }} professor(es) cadastrado(s)
+</div>
+{% else %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i> Nenhum professor cadastrado ainda.
+    <a href="/admin/sistema/professor/add/" class="alert-link">Cadastrar primeiro professor</a>
+</div>
+{% endif %}
+{% endblock %}

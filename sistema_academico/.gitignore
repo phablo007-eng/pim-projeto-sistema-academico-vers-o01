@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Envs
+.venv/
+.env
+
+# Django
+*.log
+staticfiles/
+media/
+
+db.sqlite3

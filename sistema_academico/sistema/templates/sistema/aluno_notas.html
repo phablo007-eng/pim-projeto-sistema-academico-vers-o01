@@ -1,0 +1,56 @@
+{% extends 'sistema/base.html' %}
+{% block title %}Minhas Notas{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">Minhas Notas</h1>
+
+{% if registros %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Turma</th>
+          <th>Disciplina</th>
+          <th class="text-center">P1</th>
+          <th class="text-center">P2</th>
+          <th class="text-center">Média</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Risco / Recomendação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registros %}
+          <tr>
+            <td>{{ reg.id_turma_disciplina.id_turma.nome }}</td>
+            <td>{{ reg.id_turma_disciplina.id_disciplina.nome }}</td>
+            <td class="text-center">{{ reg.nota_prova1|default:"-" }}</td>
+            <td class="text-center">{{ reg.nota_prova2|default:"-" }}</td>
+            <td class="text-center">{% if reg.media_final is not None %}{{ reg.media_final|floatformat:2 }}{% else %}-{% endif %}</td>
+            <td class="text-center">
+              {% if reg.status == 'aprovado' %}
+                <span class="badge bg-success">Aprovado</span>
+              {% elif reg.status == 'reprovado' %}
+                <span class="badge bg-danger">Reprovado</span>
+              {% else %}
+                <span class="badge bg-secondary">Pendente</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {% if reg.risco == 'alto' %}
+                <span class="badge bg-danger">Alto</span><br><small>{{ reg.recomendacao }}</small>
+              {% elif reg.risco == 'moderado' %}
+                <span class="badge bg-warning text-dark">Moderado</span><br><small>{{ reg.recomendacao }}</small>
+              {% elif reg.risco == 'ok' %}
+                <span class="badge bg-success">OK</span><br><small>{{ reg.recomendacao }}</small>
+              {% else %}
+                <span class="badge bg-secondary">Pendente</span><br><small>{{ reg.recomendacao }}</small>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="alert alert-info">Nenhuma nota disponível ainda.</div>
+{% endif %}
+{% endblock %}
