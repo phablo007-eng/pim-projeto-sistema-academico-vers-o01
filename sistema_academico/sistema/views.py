@@ -7,13 +7,34 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import (
-    Coordenador, Professor, Aluno,
-    Disciplina, Turma, TurmaDisciplina,
-    Atividade, Aula, AlunoAtividade
+    Aluno,
+    AlunoAtividade,
+    AlunoModulo,
+    Atividade,
+    Coordenador,
+    Disciplina,
+    Professor,
+    Turma,
+    TurmaDisciplina,
 )
 from .forms import AtividadeForm, EntregaAtividadeForm, CorrecaoForm, TurmaForm
-from .models import AlunoModulo
 
+# Views de Autenticação
+
+def _get_professor(request):
+    try:
+        return Professor.objects.get(usuario=request.user)
+    except Professor.DoesNotExist:
+        messages.error(request, 'Você não está cadastrado como professor.')
+        return None
+
+
+def _get_aluno(request):
+    try:
+        return Aluno.objects.get(usuario=request.user)
+    except Aluno.DoesNotExist:
+        messages.error(request, 'Você não está cadastrado como aluno.')
+        return None
 
 # Views de Autenticação
 
@@ -115,10 +136,8 @@ def lista_disciplinas(request):
 @login_required
 def professor_minhas_turmas(request):
     """Lista as turmas/módulos em que o professor leciona"""
-    try:
-        professor = Professor.objects.get(usuario=request.user)
-    except Professor.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como professor.')
+    professor = _get_professor(request)
+    if not professor:
         return redirect('home')
     
     # Módulos (TurmaDisciplina) onde este professor leciona
@@ -133,10 +152,8 @@ def professor_minhas_turmas(request):
 @login_required
 def professor_criar_atividade(request, modulo_id):
     """Professor cria uma atividade para um módulo (turma+disciplina)"""
-    try:
-        professor = Professor.objects.get(usuario=request.user)
-    except Professor.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como professor.')
+    professor = _get_professor(request)
+    if not professor:
         return redirect('home')
     
     modulo = get_object_or_404(TurmaDisciplina, pk=modulo_id)
@@ -166,10 +183,8 @@ def professor_criar_atividade(request, modulo_id):
 @login_required
 def professor_ver_atividades(request, modulo_id):
     """Professor vê todas as atividades de um módulo e suas entregas"""
-    try:
-        professor = Professor.objects.get(usuario=request.user)
-    except Professor.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como professor.')
+    professor = _get_professor(request)
+    if not professor:
         return redirect('home')
     
     modulo = get_object_or_404(TurmaDisciplina, pk=modulo_id)
@@ -190,10 +205,8 @@ def professor_ver_atividades(request, modulo_id):
 @login_required
 def professor_corrigir_entrega(request, entrega_id):
     """Professor corrige (dá nota) a uma entrega de atividade"""
-    try:
-        professor = Professor.objects.get(usuario=request.user)
-    except Professor.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como professor.')
+    professor = _get_professor(request)
+    if not professor:
         return redirect('home')
     
     entrega = get_object_or_404(AlunoAtividade.objects.select_related(
@@ -228,10 +241,8 @@ def professor_corrigir_entrega(request, entrega_id):
 @login_required
 def aluno_minhas_atividades(request):
     """Aluno vê todas as atividades das suas turmas"""
-    try:
-        aluno = Aluno.objects.get(usuario=request.user)
-    except Aluno.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como aluno.')
+    aluno = _get_aluno(request)
+    if not aluno:
         return redirect('home')
     
     # Turmas em que o aluno está matriculado
@@ -259,10 +270,8 @@ def aluno_minhas_atividades(request):
 @login_required
 def aluno_entregar_atividade(request, atividade_id):
     """Aluno faz a entrega de uma atividade"""
-    try:
-        aluno = Aluno.objects.get(usuario=request.user)
-    except Aluno.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como aluno.')
+    aluno = _get_aluno(request)
+    if not aluno:
         return redirect('home')
     
     atividade = get_object_or_404(Atividade.objects.select_related(
@@ -309,10 +318,8 @@ def aluno_minhas_notas(request):
     """Aluno vê suas notas de provas (P1/P2) por módulo e a média/status.
     Lista registros de AlunoModulo do aluno logado.
     """
-    try:
-        aluno = Aluno.objects.get(usuario=request.user)
-    except Aluno.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como aluno.')
+    aluno = _get_aluno(request)
+    if not aluno:
         return redirect('home')
 
     registros = (
@@ -402,10 +409,8 @@ def api_estatisticas_notas(request):
 @login_required
 def professor_lancar_notas(request, modulo_id):
     """Tela para o professor lançar p1/p2 por aluno do módulo e calcular média/status via C."""
-    try:
-        professor = Professor.objects.get(usuario=request.user)
-    except Professor.DoesNotExist:
-        messages.error(request, 'Você não está cadastrado como professor.')
+    professor = _get_professor(request)
+    if not professor:
         return redirect('home')
 
     modulo = get_object_or_404(TurmaDisciplina.objects.select_related('id_turma', 'id_disciplina', 'id_professor__usuario'), pk=modulo_id)
